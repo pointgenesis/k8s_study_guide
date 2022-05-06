@@ -43,13 +43,13 @@ metadata:
     name: my-pod
 spec: 
   containers:
-    - name: nginx-container
-      image: nginx
-    tolerations:
-      - key: "app"
-        operator: "Equal"
-        value: "blue"
-        effect: "NoSchedule"
+  - name: nginx-container
+    image: nginx
+  tolerations:
+  - key: "app"
+    operator: "Equal"
+    value: "blue"
+    effect: "NoSchedule"
 ~~~
 
 ___Note: all attribute values under tolerations must be in quotes.___ 
