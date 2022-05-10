@@ -33,3 +33,6 @@
 `$ kubectl explain <command-to-lookup>`
 
 `$ kubectl explain pods.spec`
+
+### Watch resources as they transition through states
+`$ kubectl get pod redis --watch`
