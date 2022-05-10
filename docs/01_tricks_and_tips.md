@@ -36,3 +36,7 @@
 
 ### Watch resources as they transition through states
 `$ kubectl get pod redis --watch`
+
+`$ watch <command>`
+
+`watch "kubectl top node"`
