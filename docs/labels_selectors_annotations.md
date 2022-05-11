@@ -79,6 +79,7 @@ metadata:
 
 ``` 
 kubectl get pods -l env=dev
+kubectl get pods -l env=dev --no-headers | wc -l
 
 NAME          READY   STATUS    RESTARTS   AGE
 app-1-fjv28   1/1     Running   0          2m59s
@@ -95,6 +96,7 @@ app-1-n2pm4   1/1     Running   0          2m59s
 
 ``` 
 kubectl get pods -l bu=finance
+kubectl get pods -l bu=finance --no-headers | wc -l
 
 NAME          READY   STATUS    RESTARTS   AGE
 app-1-zzxdf   1/1     Running   0          6m27s
@@ -109,6 +111,7 @@ auth          1/1     Running   0          6m28s
 
 ``` 
 kubectl get all -l env=prod
+kubectl get all -l env=prod --no-headers | wc -l
 
 NAME              READY   STATUS    RESTARTS   AGE
 pod/app-1-zzxdf   1/1     Running   0          8m24s
@@ -185,11 +188,11 @@ spec:
    replicas: 2
    selector:
       matchLabels:
-        tier: nginx
+        tier: front-end
    template:
      metadata:
        labels:
-        tier: nginx
+        tier: front-end
      spec:
        containers:
        - name: nginx
