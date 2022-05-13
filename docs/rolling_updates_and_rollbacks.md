@@ -73,11 +73,11 @@ You can also do this imperatively; however, the deployment definition file will 
 sync with the actual deployment.
 
 ~~~
-kubectl set image <deployment-name> <image-name>=<image-version>
+kubectl set image <deployment-name> <container-name>=<image-version>
 ~~~
 
 ~~~
-kubectl set image deployment/myapp-deployment nginx=nginx:1.9.1
+kubectl set image deployment/myapp-deployment nginx-container=nginx:1.9.1
 ~~~
 
 ### Upgrades
@@ -129,7 +129,7 @@ kubectl apply -f <updated-deployment-file-name>
 ~~~
 
 ~~~
-kubectl set image <deployment-name> <old-image-name>=<new-image-name>
+kubectl set image <deployment-name> <container-name>=<new-image-name>
 ~~~
 
 ### Status
@@ -222,6 +222,8 @@ master $
 You can now see that the change-cause is recorded for the revision 2 of this deployment.
 
 Let's make some more changes. In the example below, we are editing the deployment and changing the image from nginx:1.17 to nginx:latest while making use of the --record flag.
+
+NOTE: The edit command opens up the deployment in a VIM terminal.
 
 ~~~
 master $ kubectl edit deployments. nginx --record
