@@ -99,7 +99,3 @@ metadata:
 - Roles
 - ClusterRoles
 - RoleBindings
-
-## Ingress Resources
-
-dddddddddddd
