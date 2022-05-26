@@ -192,11 +192,15 @@ spec:
 
 ### Format
 
-```kubectl createe ingress <ingress-name> --rule="<host/path=service:port>"```
+```
+kubectl createe ingress <ingress-name> --rule="<host/path=service:port>"
+```
 
 ### Example
 
-```kubectl createe ingress ingress-test --rule="wear.myonline-store.com/wear=wear-service:80>"```
+```
+kubectl createe ingress ingress-test --rule="wear.myonline-store.com/wear=wear-service:80>"
+```
 
 ### References
 
