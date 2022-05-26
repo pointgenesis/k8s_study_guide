@@ -105,7 +105,7 @@ A set of rules and configurations applied to an ingress controller.
 #### ingress-wear.yaml
 
 ~~~yaml
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-wear
@@ -127,7 +127,80 @@ kubectl get ingress
 
 Are used to create route patterns via application context, domain, subdomain, etc.
 
-##### path-routing-rules.yaml
+##### Routing via Paths
+###### ingress-wear-watch.yaml
 
 ~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /wear
+        pathType: Prefix
+        backend:
+          service:
+            name: wear-service
+            port: 80
+      - path: /watch
+        pathType: Prefix
+        backend:
+          service:
+            name: watch-service
+            port: 80
 ~~~
+
+```
+kubectl create -f ingress-wear-watch.yaml
+```
+
+```
+kubectl describe ingress ingress-wear-watch
+```
+Note the `Default backend` attribute. If a request does not match any configured paths,
+then the request is directed to the default backend. You must create a default backend
+to handle these requests. Otherwise, the user will receive a 404 HTTP response.
+
+#### Routing via Host (Domain)
+
+##### ingress-wear-watch-yaml
+~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wear-watch
+spec:
+  rules:
+  - host: wear.my-online-store.com  
+    http:
+      paths:
+      - backend: 
+          serviceName: wear-service
+          servicePort: 80
+  - host: watch.my-online-store.com  
+    http:
+      paths:
+      - backend:
+          serviceName: watch-service
+          servicePort: 80
+~~~
+
+## Imperative Commands
+
+### Format
+
+```kubectl createe ingress <ingress-name> --rule="<host/path=service:port>"```
+
+### Example
+
+```kubectl createe ingress ingress-test --rule="wear.myonline-store.com/wear=wear-service:80>"```
+
+### References
+
+[[1] Ingress, https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-ingress-em-](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-ingress-em-)
+[[2] Ingress Feature State, https://kubernetes.io/docs/concepts/services-networking/ingress/](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+[[3] Path types, https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types)
+
