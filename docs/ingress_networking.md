@@ -188,23 +188,118 @@ spec:
           servicePort: 80
 ~~~
 
-## Imperative Commands
+### Imperative Commands
 
-### Format
-
-```
-kubectl createe ingress <ingress-name> --rule="<host/path=service:port>"
-```
-
-### Example
+###### Format
 
 ```
-kubectl createe ingress ingress-test --rule="wear.myonline-store.com/wear=wear-service:80>"
+kubectl create ingress <ingress-name> --rule="<host/path=service:port>"
 ```
 
-### References
+###### Example
+
+```
+kubectl create ingress ingress-test --rule="wear.myonline-store.com/wear=wear-service:80>"
+```
+
+### rewrite-target
+
+This is similar to the ProxyPass directive in an httpd.conf file for Apache HTTPD Server where
+and incoming request is mapped to a corresponding location, i.e., 
+
+```
+ProxyPath "/backend" "http://backend.example.com"
+```
+
+The ***rewrite-target*** maps the ingress request in the same way.
+
+See the following [examples](https://kubernetes.github.io/ingress-nginx/examples/rewrite/) for more details.
+
+~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+  name: rewrite
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: rewrite.bar.com
+    http:
+      paths:
+      - path: /something(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: http-svc
+            port: 
+              number: 80
+~~~
+
+In this ingress definition, any characters captured by (.*) will be assigned to the placeholder $2, which is then used as a parameter in the rewrite-target annotation.
+
+For example, the ingress definition above will result in the following rewrites:
+
+rewrite.bar.com/something rewrites to rewrite.bar.com/
+rewrite.bar.com/something/ rewrites to rewrite.bar.com/
+rewrite.bar.com/something/new rewrites to rewrite.bar.com/new
+
+
+##### App Root
+
+~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/app-root: /app1
+  name: approot
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: approot.bar.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: http-svc
+            port: 
+              number: 80
+~~~
+
+To fix that we want to "ReWrite" the URL when the request is passed on to the watch or wear applications. We don't want to pass in the same path that user typed in. So we specify the rewrite-target option. This rewrites the URL by replacing whatever is under rules->http->paths->path which happens to be /pay in this case with the value in rewrite-target. This works just like a search and replace function.
+
+For example: replace(path, rewrite-target)
+In our case: replace("/path","/")
+
+~~~yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+  namespace: critical-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /pay
+        backend:
+          serviceName: pay-service
+          servicePort: 8282
+~~~
+
+## References
 
 [[1] Ingress, https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-ingress-em-](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#-em-ingress-em-)
+
 [[2] Ingress Feature State, https://kubernetes.io/docs/concepts/services-networking/ingress/](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+
 [[3] Path types, https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types)
 
