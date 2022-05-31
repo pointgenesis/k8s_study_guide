@@ -74,7 +74,7 @@ spec:
     targetPort: 443
     protocol: TCP
     name: https
-  selectors:
+  selector:
     name: nginx-ingress
 ~~~
 
