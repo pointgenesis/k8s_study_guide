@@ -1,16 +1,29 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import logging
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+log = logging.getLogger('__name__')
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+class Main:
+    """
+    References:
+    [1] Logging, https://realpython.com/python-logging/
+    [2] ArgumentParser, https://docs.python.org/3/library/argparse.html
+    [3] Virtual Environment, https://realpython.com/python-virtual-environments-a-primer/
+    [4] Markdown to HTML, https://www.digitalocean.com/community/tutorials/how-to-use-python-markdown-to-convert-markdown-text-to-html
+    [5] Factory Pattern, https://realpython.com/factory-method-python/
+    [6] Python Interface, https://realpython.com/python-interface/
+    """
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    def __init__(self) -> None:
+        pass
+
+
+def main() -> None:
+    log.setLevel(logging.DEBUG)
+    log.debug('test')
+
+
+if __name__ == "__main__":
+    main()
