@@ -25,7 +25,7 @@ class MarkdownToHtml(FileFormatConverter):
         file_path = os.path.dirname(os.path.realpath(__file__))
         log.info(f'current file directory: {file_path}')
 
-        # https://www.geeksforgeeks.org/python-read-file-from-sibling-directory/ <<<<<<<<<<<<<<<<<<<<<<<<<<<< Read 
+        # https://www.geeksforgeeks.org/python-read-file-from-sibling-directory/ <<<<<<<<<<<<<<<<<<<<<<<<<<<< Read
 
         # shutil.rmtree()
         # 1. delete the html directory and all contained files and directories
