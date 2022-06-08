@@ -1,5 +1,5 @@
 import logging
-from file_format_converter import FileFormatConverter
+from file_format_converter_factory import FileFormatConverterFactory
 from file_conversion_type import FileConversionType
 
 log = logging.getLogger('__name__')
@@ -24,7 +24,9 @@ class Main:
 def main() -> None:
     log.setLevel(logging.DEBUG)
     log.debug('test')
-    format_converter = FileFormatConverter(FileConversionType.MD_TO_HTML)
+    file_format_converter_factory = FileFormatConverterFactory(True)
+    file_format_converter = file_format_converter_factory.get_file_format_converter(FileConversionType.MD_TO_HTML)
+    file_format_converter.convert()
 
 
 if __name__ == "__main__":
