@@ -439,7 +439,7 @@ vi ingress-resource.yaml
 
 Copy/Paste from the Ingress documentation, then update according to our given specs.
 
-~~~
+~~~yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
