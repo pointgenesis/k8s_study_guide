@@ -54,6 +54,8 @@ class MarkdownToHtml(FileFormatConverter):
                 f.write(html_data)
 
         # 7. copy the markdown/images folder to html/images
+        images_file_path = os.path.join(file_path, '../markdown/images')
+        TODO....
 
 # References:
 # [1] https://www.geeksforgeeks.org/python-read-file-from-sibling-directory/
