@@ -47,7 +47,9 @@ class MarkdownToHtml(FileFormatConverter):
                 # 5. convert markdown to html
                 html_data = markdown.markdown(markdown_data)
 
-            with open(file_path.replace('.md', '.html'), 'r') as f:
+            file_path = f"{html_file_path}/{file.replace('.md', '.html')}"
+            log.debug(f'Writing file: {file_path}')
+            with open(file_path, 'w') as f:
                 # 6. save html in the html directory
                 f.write(html_data)
 
