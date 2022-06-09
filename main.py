@@ -25,8 +25,8 @@ def main() -> None:
     log.setLevel(logging.DEBUG)
     log.debug('test')
     file_format_converter_factory = FileFormatConverterFactory(True)
-    file_format_converter = file_format_converter_factory.get_file_format_converter(FileConversionType.MD_TO_HTML)
-    file_format_converter.convert()
+    md_to_html_converter = file_format_converter_factory.get_file_format_converter(FileConversionType.MD_TO_HTML)
+    md_to_html_converter.convert()
 
 
 if __name__ == "__main__":
