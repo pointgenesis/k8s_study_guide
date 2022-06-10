@@ -234,3 +234,39 @@ The following solutions support network policies:
 
 The following solutions do not support network policies:
 - Flannel
+
+## Lab Solutions
+
+1. How many network policies do you see in the environments?
+
+~~~
+kubectl get networkpolicy
+~~~
+
+Alternate solution using shorthand
+
+~~~
+kubectl get netpol
+~~~
+
+2. What pods are using this policy?
+
+Hint: Using the selector value that shows up from question-1 check the pods.
+
+~~~
+kubectl get pods -l name=payroll
+~~~
+
+3. What type of traffic is this Network Policy configured to handle?
+
+~~~
+kubetctl describe networkpolicy payroll-policy
+~~~
+
+See: **Policy Types** in the response
+
+4. What is the effect of the rule configured on this Network Policy?
+
+Answer: 
+
+5. ddk
