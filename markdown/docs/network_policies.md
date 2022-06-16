@@ -269,4 +269,147 @@ See: **Policy Types** in the response
 
 Answer: 
 
-5. ddk
+``` 
+kubectl describe netpol payroll-policy
+```
+
+~~~properties
+Name: payroll-policy
+Namespace: default
+Created on: 2020-08-21 05:14:46 +0000 UTC
+Labels: <none>
+Annotations: Spec:
+    PodSelector: name=payroll
+    Allowing ingress traffic:
+        To Port: 8080/TCP
+        From:
+            PodSelector: name=internal
+    Not affecting ingress traffic
+    Policy Types: Ingress
+~~~
+
+Verify the name of the pod based upon the selector (name=internal).
+
+``` 
+kubectl get pods -l name=internal
+```
+
+Traffic from internal to Payroll Pod is allowed.
+
+5. Create a network policy to allow traffic from the **internal** application only to the
+**payroll-service** and **db-service**.
+
+Specs:
+
+- Policy Name: internal-policy
+- Policy Types: Egress
+- Egress Allow: payroll
+- Payroll Port: 8080
+- Egress Allow: mysql
+- MYSQL Port: 3306
+
+#### internal-policy.yaml
+
+Copied and modified from Kubernetes documentation.
+
+~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: internal 
+  policyTypes:    
+  - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              role: frontend
+        ports:
+        - protocol: TCP
+          port: 3306
+~~~
+
+Verify the name of the **mysql** pod.
+
+``` 
+kubectl get pods --show-labels
+```
+
+``` 
+NAME        READY       STATUS      RESTARTS        AGE         LABELS
+external    1/1         Running     0               16m         name=external
+internal    1/1         Running     0               16m         name=internal
+mysql       1/1         Running     0               16m         name=mysql
+payroll     1/1         Running     0               16m         name=payroll
+```
+
+Update the selector name.
+
+~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: internal 
+  policyTypes:    
+  - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              name: mysql
+        ports:
+        - protocol: TCP
+          port: 3306
+~~~
+
+Add another section for egress to the **payroll-service**.
+
+~~~yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: internal-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      name: internal 
+  policyTypes:    
+  - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              name: mysql
+        ports:
+        - protocol: TCP
+          port: 3306
+    - to:
+        - podSelector:
+            matchLabels:
+              name: payroll
+        ports:
+        - protocol: TCP
+          port: 8080
+~~~
+
+``` 
+kubectl create -f internal-policy.yaml
+```
+
+``` 
+kubectl describe netpol internal-policy
+```
+
+6. dkskds
+
