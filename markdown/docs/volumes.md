@@ -264,7 +264,7 @@ spec:
         claimName: myclaim
 ~~~
 
-## Labs
+## Lab Solution
 
 #### View Logs
 
@@ -278,48 +278,243 @@ If the pod were deleted, then you would no longer be able to access these logs.
 
 1. Configure a volume to store these logs at /var/log/webapp on the host using the spec:
 
-#### Spec:
-- Name: webapp
-- Image Name: kodekloud/event-simulator
-- Volume HostPath: /var/log/webapp
-- Volume Mount: /log
-
-#### webapp.yaml
-
-~~~yaml
-kind: Pod
-metadata:
-  name: webapp
-spec:
-  containers:
-  - name: event-simulator
-    image: kodekloud/event-simulator
-    env:
-    - name: LOG_HANDLERS
-      value: file
-    volumeMounts:
-    - mountPath: /log
-      name: log-volume
-
-  volumes:
-  - name: log-volume
-    hostPath:
-      # directory location on host
-      path: /var/log/webapp
-      # this field is optional
-      type: Directory
-~~~
-
-``` 
-kubectl replace -f webapp.yaml --force
-```
+    #### Spec:
+    - Name: webapp
+    - Image Name: kodekloud/event-simulator
+    - Volume HostPath: /var/log/webapp
+    - Volume Mount: /log
+    
+    #### webapp.yaml
+    
+    ~~~yaml
+    kind: Pod
+    metadata:
+      name: webapp
+    spec:
+      containers:
+      - name: event-simulator
+        image: kodekloud/event-simulator
+        env:
+        - name: LOG_HANDLERS
+          value: file
+        volumeMounts:
+        - mountPath: /log
+          name: log-volume
+    
+      volumes:
+      - name: log-volume
+        hostPath:
+          # directory location on host
+          path: /var/log/webapp
+          # this field is optional
+          type: Directory
+    ~~~
+    
+    ``` 
+    kubectl replace -f webapp.yaml --force
+    ```
 
 2. Create a PersistentVolume with the following spec:
 
-#### Spec:
+    #### Spec:
+    
+    - Volume Name: pv-log
+    - Storage: 100Mi
+    - Access Modes: ReadWriteMany
+    - Host Path: /pv/log
+    - Reclaim Policy: Retain
+    
+    #### pv-definition.yaml
+    
+    ~~~yaml
+    apiVersion: v1
+    kind: PersistentVolume
+    metadata:
+        name: pv-log
+    spec:
+        capacity:
+          storage: 100Mi
+        accessModes:
+        - ReadWriteMany
+        hostPath:
+          path: /pv/log
+    ~~~
+    
+    Let's lookup the options for hostPath in the PersistentVolume CLI documentation. 
+    
+    ``` 
+    kubectl explain persistentvolume --recursive | less
+    ```
+    
+    ``` 
+    kubectl create -f pv-definition.yaml
+    ```
+    
+    ```
+    kubectl get pv
+    ```
 
-- Volume Name: pv-log
-- Storage: 100Mi
-- Access Modes: ReadWriteMany
-- Host Path: /pv/log
-- Reclaim Policy: Retain
+3. Claim some of the space for our application using a Persistent Volume Claim with the
+given specifications.
+
+    #### Spec
+    
+    - Volume Name: claim-log-1
+    - Storage Request: 50Mi
+    - Access Modes: ReadWriteOnce
+    
+    #### pvc-definition.yaml
+    
+    ~~~yaml
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+        name: claim-log-1
+    spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Mi
+    ~~~
+    
+    ``` 
+    kubectl create -f pvc-definition.yaml
+    ```
+
+4. What is the state of the PersistentVolumeClaim?
+
+    ``` 
+    kubectl get pvc
+    ```
+    
+    It's currently in the Pending state.
+
+5. What is the state of the PersistentVolume?
+
+    ``` 
+    kubectl get pc
+    ```
+    
+    It's currently still available.
+
+6. Why is the persistent volume claim not bound to the persistent volume?
+
+    ``` 
+    There is an accessMode mismatch, i.e., ReadWriteOnce (pvc) vs ReadWriteMany (pv)
+    ```
+   
+7. Update the access mode on the claim, delete, and recreate the claim.
+
+    #### pvc-definition.yaml
+    
+    ~~~yaml
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+        name: claim-log-1
+    spec:
+        accessModes:
+        - ReadWriteMany
+        resources:
+          requests:
+            storage: 50Mi
+    ~~~
+   
+   ``` 
+   kubectl replace -f pvc-definition.yaml --force
+   ```
+8. You requested 50Mi capacity. How much capacity is allocated to the claim?
+
+    ``` 
+    kubectl get pvc
+    ```
+    There is 100Mi allocated to the claim, because there is only one volume available
+    that matches all other criteria.
+    
+9. Update the webapp pod to use the persistent volume claim as its storage.
+
+    Spec:
+    
+    - Name: webapp
+    - Image Name: kodekloud/event-simulator
+    - Volume: PersistentVolumeClaim=claim-log-1
+    - Volume Mount: /log
+    
+    #### webapp.yaml
+    
+    ~~~yaml
+    kind: Pod
+    metadata:
+      name: webapp
+    spec:
+      containers:
+      - name: event-simulator
+        image: kodekloud/event-simulator
+        env:
+        - name: LOG_HANDLERS
+          value: file
+        volumeMounts:
+        - mountPath: /log
+          name: log-volume
+    
+      volumes:
+      - name: log-volume
+        persistentVolumeClaim:
+          claimName: claim-log-1
+    ~~~
+    
+    ``` 
+    kubectl replace -f webapp.yaml --force
+    ```
+10. What is the Reclaim Policy set on the Persistent Volume - **pv-log**?
+
+    ```
+     kubectl describe pv pv-log
+    ```
+    
+    Retain
+
+11. What would happen to the PV is the PVC was destroyed?
+
+    The PersistentVolume is not delete but it is not available for other claims either.
+    
+12. Try deleting the PVC and notice what happens.
+
+    ``` 
+    kubectl delete pvc claim-log-1
+    ```
+    
+    ctrl + c
+    
+    ```
+    kubectl get pvc claim-log-1
+    ```
+    
+    The claim is stuck in a terminating state.
+    
+13. Why is the PVC stuck in a **Terminating** state?
+
+    Because the claim is used/referenced by a pod (webapp).
+    
+14. Delete the webapp pod.
+
+    ``` 
+    kubectl delete pod webapp
+    ```
+
+15. What is the state of the PVC now?
+
+    ``` 
+    kubectl get pvc claim-log-1
+    ```
+    
+    It has been deleted along with the pod.
+    
+16. What is the state of the persistent volume?
+
+    ``` 
+    kubectl get pv pv-log
+    ```
+    
+    The persistent volume has been released.

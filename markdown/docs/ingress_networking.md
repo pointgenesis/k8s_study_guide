@@ -295,188 +295,189 @@ spec:
           servicePort: 8282
 ~~~
 
-## Labs
+## Lab Solution
 
 1. We have deployed two applications. Explore the setup.
 
-~~~
-kubectl get deployments --all-namespaces
-~~~
+    ~~~
+    kubectl get deployments --all-namespaces
+    ~~~
 
 2. Let's deploy an Ingress Controller. First, create a namespace called 'ingress-space'.
 
-ns &lrarr; namespace
-
-~~~
-kubectl create ns ingress-space
-~~~
+    ns &lrarr; namespace
+    
+    ~~~
+    kubectl create ns ingress-space
+    ~~~
 
 3. The NGINX Ingress Controller requires a ConfigMap object. Create a ConfigMap object in the ingress-space.
 
-cm &lrarr; configmap 
-
-~~~
-kubectl create cm nginx-configuration  -n ingress-space
-~~~
+    cm &lrarr; configmap 
+    
+    ~~~
+    kubectl create cm nginx-configuration  -n ingress-space
+    ~~~
 
 4. The NGINX Ingress Controller requires a ServiceAccount. Create a ServiceAccount in the
 ingress-space with name, ingress-serviceaccount.
 
-sa &lrarr; serviceaccount 
-
-~~~
-kubectl create sa ingress-serviceaccount -n ingress-space
-~~~
+    sa &lrarr; serviceaccount 
+    
+    ~~~
+    kubectl create sa ingress-serviceaccount -n ingress-space
+    ~~~
 
 5. We created the Roles and RoleBindings for the ServiceAccount. Check it out!
 
-~~~
- kubectl -n ingress-space get roles.rbac.authorization.k8s.io
- 
- kubectl -n ingress-space get rolebindings.rbac.authorization.k8s.io
-~~~
+    ~~~
+     kubectl -n ingress-space get roles.rbac.authorization.k8s.io
+     
+     kubectl -n ingress-space get rolebindings.rbac.authorization.k8s.io
+    ~~~
 
 6. Let's deploy the Ingress Controller. Create a deployment using the file given. There are
 several issues with the file. Try to fix the issues.
 
-~~~yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ingress-controller
-  namespace: ingress-space
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      name: nginx-ingress
-  template:
+    ~~~yaml
+    apiVersion: apps/v1
+    kind: Deployment
     metadata:
-      labels:
-        name: nginx-ingress
+      name: ingress-controller
+      namespace: ingress-space
     spec:
-      serviceAccountName: ingress-serviceaccount
-      containers: 
-        - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.21.0
-          args: 
-            - /nginx-ingress-controller
-            - --configmap=$(POD_NAMESPACE)/nginx-configuration
-            - --default-backend-service=app-space/default-http-backend
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          ports:
-            - name: http
-              containerPort: 80
-            - name: https
-              containerPort: 443
-~~~
+      replicas: 1
+      selector:
+        matchLabels:
+          name: nginx-ingress
+      template:
+        metadata:
+          labels:
+            name: nginx-ingress
+        spec:
+          serviceAccountName: ingress-serviceaccount
+          containers: 
+            - name: nginx-ingress-controller
+              image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.21.0
+              args: 
+                - /nginx-ingress-controller
+                - --configmap=$(POD_NAMESPACE)/nginx-configuration
+                - --default-backend-service=app-space/default-http-backend
+              env:
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+              ports:
+                - name: http
+                  containerPort: 80
+                - name: https
+                  containerPort: 443
+    ~~~
 
 7. Let's create a service to make Ingress available to external users.
 
-Specs:
+    Specs:
 
-- Name: ingress
-- Type: NodePort
-- Port: 80
-- TargetPort: 80
-- NodePort: 30080
-- Note: Remember to use the right selector
-
-~~~
-kubectl -n ingress-space expose deployment ingress-controller --name ingress /
---port 80 --target-port 80 --type NodePort --dry-run=client -o yaml > ingress-service.yaml
-~~~
-
-~~~yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: ingress
-  namespace: ingress-space
-spec:
-  ports:
-    - port: 80
-      protocol: TCP
-      targetPort: 80
-      nodePort: 30080
-    selector:
-      name: nginx-ingress
-    type: NodePort
-status:
-  loadBalancer: {}
-~~~
-
-~~~
-kubectl apply -f ingress-service.yaml
-~~~
+    - Name: ingress
+    - Type: NodePort
+    - Port: 80
+    - TargetPort: 80
+    - NodePort: 30080
+    - Note: Remember to use the right selector
+        
+    ```
+    kubectl -n ingress-space expose deployment ingress-controller --name ingress
+    --port 80 --target-port 80 --type NodePort --dry-run=client -o yaml > ingress-service.yaml
+    ```
+    
+    ~~~yaml
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: ingress
+      namespace: ingress-space
+    spec:
+      ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 80
+          nodePort: 30080
+        selector:
+          name: nginx-ingress
+        type: NodePort
+    status:
+      loadBalancer: {}
+    ~~~
+    
+    ~~~
+    kubectl apply -f ingress-service.yaml
+    ~~~
 
 8. Create the ingress resource to make the applications available at /wear and /watch on the ingress service.
 
-Spec:
-- Ingress Created
-- Path: /wear
-- Path: /watch
-- Configure correct backend service for /wear
-- Configure correct backed service for /watch
-- Configure correct backend port for /wear service
-- Configure correct backend port for /watch service
+    Spec:
+    
+    - Ingress Created
+    - Path: /wear
+    - Path: /watch
+    - Configure correct backend service for /wear
+    - Configure correct backed service for /watch
+    - Configure correct backend port for /wear service
+    - Configure correct backend port for /watch service
+    
+    ~~~
+    kubectl get svc -n app-space
+    ~~~
+    
+    ~~~
+    vi ingress-resource.yaml
+    ~~~
 
-~~~
-kubectl get svc -n app-space
-~~~
-
-~~~
-vi ingress-resource.yaml
-~~~
-
-Copy/Paste from the Ingress documentation, then update according to our given specs.
-
-~~~yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  namespace: app-space
-  name: service-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  ingressClassName: nginx-example
-  rules:
-  - http:
-      paths:
-      - path: /wear
-        pathType: Prefix
-        backend:
-          service:
-            name: wear-service
-            port:
-              number: 8080
-      - path: /watch
-        pathType: Prefix
-        backend:
-          service:
-            name: video-service
-            port:
-              number: 8080              
-~~~
-
-Finally, apply the changes.
-
-~~~
-kubectl apply -f ingress-resource.yaml
-~~~
-
-~~~
-kubectl -n app-space describe ingress service-ingress
-~~~
+    Copy/Paste from the Ingress documentation, then update according to our given specs.
+    
+    ~~~yaml
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      namespace: app-space
+      name: service-ingress
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+    spec:
+      ingressClassName: nginx-example
+      rules:
+      - http:
+          paths:
+          - path: /wear
+            pathType: Prefix
+            backend:
+              service:
+                name: wear-service
+                port:
+                  number: 8080
+          - path: /watch
+            pathType: Prefix
+            backend:
+              service:
+                name: video-service
+                port:
+                  number: 8080              
+    ~~~
+    
+    Finally, apply the changes.
+    
+    ~~~
+    kubectl apply -f ingress-resource.yaml
+    ~~~
+    
+    ~~~
+    kubectl -n app-space describe ingress service-ingress
+    ~~~
 
 ## References
 
