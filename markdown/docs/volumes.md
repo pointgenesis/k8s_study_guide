@@ -1,4 +1,4 @@
-``````# Volumes
+# Volumes
 
 ## Docker Volumes
 
@@ -263,3 +263,63 @@ spec:
       persistentVolumeClaim:
         claimName: myclaim
 ~~~
+
+## Labs
+
+#### View Logs
+
+Exec into the container and view the logs.
+
+```
+kubectl exec webapp -- cat /log/app.log
+```
+
+If the pod were deleted, then you would no longer be able to access these logs.
+
+1. Configure a volume to store these logs at /var/log/webapp on the host using the spec:
+
+#### Spec:
+- Name: webapp
+- Image Name: kodekloud/event-simulator
+- Volume HostPath: /var/log/webapp
+- Volume Mount: /log
+
+#### webapp.yaml
+
+~~~yaml
+kind: Pod
+metadata:
+  name: webapp
+spec:
+  containers:
+  - name: event-simulator
+    image: kodekloud/event-simulator
+    env:
+    - name: LOG_HANDLERS
+      value: file
+    volumeMounts:
+    - mountPath: /log
+      name: log-volume
+
+  volumes:
+  - name: log-volume
+    hostPath:
+      # directory location on host
+      path: /var/log/webapp
+      # this field is optional
+      type: Directory
+~~~
+
+``` 
+kubectl replace -f webapp.yaml --force
+```
+
+2. Create a PersistentVolume with the following spec:
+
+#### Spec:
+
+- Volume Name: pv-log
+- Storage: 100Mi
+- Access Modes: ReadWriteMany
+- Host Path: /pv/log
+- Reclaim Policy: Retain
