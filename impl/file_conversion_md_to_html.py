@@ -25,17 +25,17 @@ class MarkdownToHtml(FileFormatConverter):
             log.debug(f'current working directory: {current_directory}')
 
         # 1. get the directory where the current file exists
-        file_path = os.path.dirname(os.path.realpath(__file__))
-        log.info(f'current file directory: {file_path}')
+        real_file_path = os.path.dirname(os.path.realpath(__file__))
+        log.info(f'current file directory: {real_file_path}')
 
         # 2. reference the html directory where generated output is stored
-        html_file_path = os.path.join(file_path, '../html')
+        html_file_path = os.path.join(real_file_path, '../html')
 
         # 3. delete the html directory and all contained files and directories
         FileUtils.delete_files_from_directory(html_file_path, True)
 
         # 4. get markdown data
-        markdown_file_path = os.path.join(file_path, '../markdown/docs')
+        markdown_file_path = os.path.join(real_file_path, '../markdown/docs')
         log.debug(f'{os.listdir(markdown_file_path)}')
         files = [obj for obj in os.listdir(markdown_file_path) if os.path.isfile(f'{markdown_file_path}/{obj}')]
 
@@ -54,8 +54,19 @@ class MarkdownToHtml(FileFormatConverter):
                 f.write(html_data)
 
         # 7. copy the markdown/images folder to html/images
-        images_file_path = os.path.join(file_path, '../markdown/images')
-        TODO....
+        images_src_path = os.path.join(real_file_path, '../markdown/images')
+        images_dest_path = os.path.join(real_file_path, '../html/images')
+        log.debug(f'images_src_path: {images_src_path} | images_dest_path: {images_dest_path}')
+
+        file_mode = 0o777
+        os.mkdir(images_dest_path, file_mode)
+        log.info(f'Created directory {images_dest_path}')
+
+        for filename in os.listdir(images_src_path):
+            source = f'{images_src_path}/{filename}'
+            destination = f'{images_dest_path}/{filename}'
+            shutil.copy(source, destination)
+            log.info(f'Copied file from {source} to {destination}')
 
 # References:
 # [1] https://www.geeksforgeeks.org/python-read-file-from-sibling-directory/
