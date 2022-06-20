@@ -44,6 +44,10 @@ docker stop scary_sally
 #### rm <container-name>
 
 ``` 
+rm <container-name> | <container-id> [<container-name> | <container-id> ...]
+```
+
+``` 
 docker rm scary_sally
 ```
 
@@ -57,7 +61,13 @@ docker images
 
 ## Remove Images
 
+You can remove one or more images using the following command.
+
 #### rmi <image-name>
+
+```
+rmi <image-name> [<image-name> <image-name>...]
+```
 
 ``` 
 docker rmi nginx
@@ -94,5 +104,43 @@ the CTRL+C keys to quit.
 docker run some-kind-of-monster
 ```
 
-There is another mode where the user is able to use the terminal. The process is kicked off
-and is running in the background, but the user is free to proceed in the foreground. 
+In detached mode, the user is still able to use the terminal. The process is kicked off
+and is running in the background, but the user is free to proceed using the terminal 
+in the foreground.
+
+#### Detached Mode
+
+``` 
+docker run -d some-kind-of-monster
+```
+
+Issue the following command if you need to switch back to attached mode. Note you do not need
+to provide the entire container-id, you can provide just a few characters as long as they
+result in a unique container-id value.
+
+#### Short Container Id
+
+```
+a08de2 vs a08de21d49a392b048393e39f0a999c
+```
+
+#### Attach Command
+
+``` 
+docker attach <container-id>
+```
+
+``` 
+docker attach a08de2
+```
+
+#### Interactive Terminal
+
+You can also get a terminal inside the container. The following command will place you inside
+the running containers bash terminal.
+
+``` 
+docker run -it centos bash
+```
+
+
