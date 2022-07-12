@@ -102,3 +102,9 @@ Created branches for environments that required
 - Prod
     - UAT
     - PROD
+    
+### GitOps
+- Iac
+- Version Control
+- Pull Request/Merge
+- CI/CD Pipeline
