@@ -65,3 +65,40 @@ Angular Material has great Components... but no support for CSS Reset, CSS Layou
 Bootstrap has great CSS Reset, CSS Layout, CSS Utilities... but no Components 
 
 SO USE THEM BOTH!
+
+# GitOps
+
+### Problem
+- Initially, all code was pushed to main/master... BAD!
+- Jira was too course
+    - Defined
+    - In-progress
+    - Done
+### Solution
+Created branches for environments that required
+- PR
+- Code Review
+- Collaboration between QA and Developer
+- Automation Test
+    - Unit Tests (Invalid YAML)
+    - Acceptance Tests
+- Then merged into target branch   
+
+### Jira
+- Defined
+- Blocked
+- In-progress
+- Dev Complete/Ready for QA
+- In QA
+- QA Complete
+- Merged/Done
+
+### Environments
+- DevOps
+- Staging
+- Dev
+    - DEV1, DEV2, ...
+    - QA1, QA2, ...
+- Prod
+    - UAT
+    - PROD
