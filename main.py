@@ -23,10 +23,10 @@ class Main:
 
 def main() -> None:
     log.setLevel(logging.DEBUG)
-    log.debug('test')
-    file_format_converter_factory = FileFormatConverterFactory(True)
-    md_to_html_converter = file_format_converter_factory.get_file_format_converter(FileConversionType.MD_TO_HTML)
+    log.debug('Beginning conversion of markdown to desired format.')
+    md_to_html_converter = FileFormatConverterFactory(True).get_instance(FileConversionType.MD_TO_HTML)
     md_to_html_converter.convert()
+    log.info('Finished conversion of markdown to desired format.')
 
 
 if __name__ == "__main__":

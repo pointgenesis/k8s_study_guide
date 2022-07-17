@@ -30,7 +30,7 @@ Increase/decrease width between elements, i.e., columns
 ## Pixels (px) vs EM vs REM
 
 ### Citigroup
-Content Managemnt System (CMS)
+TeamSite Interwoven - Content Management System (CMS)
 - Page Templates used to create specific pages.
 - The specific pages used predefined object names to attach content. 
 - The content was cached via platform component
@@ -47,8 +47,21 @@ Native development using Kony (similar to Titanium) writing Lua script then Java
 that is then transformed into native languages per user selected output, i.e., HTML4, HTML5,
 Android (version), iOS/iPhone (version), Tablet, Blackberry, Windows Phone, etc.
 
+Browser Shim (fix existing code)
+Browser Polyfill (legacy browser fix)
 
 ### Black Knight
+Originate - Contract firm... 
+- Front-end design (2) plus 
+- Front-end Coding (4) plus 
+- PM (1)
+
+HW Team 
+- Microservice/Lambda (4) 
+- Front-end (2)
+- Peer (1) Product Owner
+
+
 Sprint Management
 CA Rally -- Similar to Jira
 

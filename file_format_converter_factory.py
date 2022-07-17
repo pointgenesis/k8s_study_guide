@@ -16,7 +16,7 @@ class FileFormatConverterFactory:
             log.setLevel(logging.DEBUG)
         log.info(f'Initializing {self.__class__.__name__}')
 
-    def get_file_format_converter(self, conversion_type: FileConversionType) -> FileFormatConverter:
+    def get_instance(self, conversion_type: FileConversionType) -> FileFormatConverter:
         if conversion_type == FileConversionType.MD_TO_HTML:
             log.info(f'{conversion_type} is a supported conversion type.')
             # current_directory = os.path.abspath(__file__)
